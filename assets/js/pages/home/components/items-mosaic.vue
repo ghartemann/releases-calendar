@@ -7,9 +7,8 @@
 
             <div v-else class="tw-flex tw-justify-center tw-gap-2 tw-flex-wrap">
                 <div v-for="(item, index) in items" :key="index"
-                     class="tw-flex tw-justify-center tw-items-end tw-p-5 tw-gap-2 tw-w-[13.75rem] tw-h-[20.625rem] tw-rounded-xl"
-                     :style="`background:url('` + getUrl(item.poster_path) + `');`"
-                     style="background-size:100%">
+                     class="tw-flex tw-justify-center tw-items-end tw-p-5 tw-gap-2 tw-w-[13.75rem] tw-h-[20.625rem] tw-rounded-xl !tw-bg-cover hover:tw-opacity-60"
+                     :style="`background:url('` + getUrl(item.poster_path) + `');`">
 
                     <div class="tw-absolute tw-text-white text-center">
                         <div>{{ frenchizeDate(item.release_date) }}</div>
@@ -48,8 +47,10 @@ export default defineComponent({
         getItems() {
             this.loading = true;
 
-            axios.get(this.apiInfos.url, {params: this.apiInfos.params}).then((r) => {
+            axios.get(this.apiInfos.specificInfos.url, {params: this.apiInfos.params}).then((r) => {
                 this.items = r.data.results;
+
+                this.sortByDate(this.items, this.apiInfos.specificInfos.dateParamName);
             }).catch((error) => {
                 console.error(error);
             }).finally(() => {
@@ -57,10 +58,15 @@ export default defineComponent({
             });
         },
         getUrl(posterPath) {
-            return this.apiInfos.urlPosters + posterPath;
+            return this.apiInfos.specificInfos.urlPosters + posterPath;
         },
         frenchizeDate(date) {
             return new moment(date).format('DD/MM/YYYY');
+        },
+        sortByDate(items, parameter) {
+            return items.sort((a,b) => {
+                return new Date(a[parameter]) - new Date(b[parameter]);
+            });
         }
     }
 })

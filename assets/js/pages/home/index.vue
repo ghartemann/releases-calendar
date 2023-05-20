@@ -21,8 +21,11 @@ export default defineComponent({
         loadingUpcoming: false,
         apiInfos: {
             movies: {
-                url: 'https://api.themoviedb.org/3/discover/movie',
-                urlPosters: 'https://www.themoviedb.org/t/p/w440_and_h660_face',
+                specificInfos: {
+                    url: 'https://api.themoviedb.org/3/discover/movie',
+                    urlPosters: 'https://www.themoviedb.org/t/p/w440_and_h660_face',
+                    dateParamName: 'release_date'
+                },
                 params: {
                     include_adult: false,
                     include_video: false,

@@ -38,23 +38,56 @@ export default defineComponent({
     },
     data: () => ({
         items: [],
+        source: '',
         loading: false
     }),
     created() {
-        this.getItems();
+        this.getItemsFromDb();
     },
     methods: {
-        getItems() {
+        getItemsFromDb() {
             this.loading = true;
+            let itemsTooRecent = false;
 
-            axios.get(this.apiInfos.specificInfos.url, {params: this.apiInfos.params}).then((r) => {
-                this.items = r.data.results;
+            axios.get('/api/get-upcoming-' + this.type).then((r) => {
+                if (r.data !== null) {
+                    itemsTooRecent = new moment().diff(new moment(r.data.createdAt), 'hours') < 24;
 
-                this.sortByDate(this.items, this.apiInfos.specificInfos.dateParamName);
+                    if (Object.keys(r.data).length === 0 || itemsTooRecent === false) {
+                        this.getItemsFromApi();
+                    } else {
+                        this.source = 'db';
+
+                        this.items = r.data.content;
+                    }
+                }
             }).catch((error) => {
                 console.error(error);
             }).finally(() => {
                 this.loading = false;
+            });
+        },
+        getItemsFromApi() {
+            this.loading = true;
+
+            axios.get(this.apiInfos.specificInfos.url, {params: this.apiInfos.params}).then((r) => {
+                this.source = 'api';
+
+                this.items = r.data.results;
+                this.sortByDate(this.items, this.apiInfos.specificInfos.dateParamName);
+
+                this.saveItemsToDb();
+            }).catch((error) => {
+                console.error(error);
+            }).finally(() => {
+                this.loading = false;
+            });
+        },
+        saveItemsToDb() {
+            axios.post('/api/save-upcoming-' + this.type, {items: this.items}).then((r) => {
+
+            }).catch((error) => {
+                console.error(error);
             });
         },
         getUrl(posterPath) {

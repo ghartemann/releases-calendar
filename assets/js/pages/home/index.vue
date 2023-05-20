@@ -28,8 +28,8 @@ export default defineComponent({
                 },
                 params: {
                     include_adult: false,
-                    include_video: false,
-                    language: 'en_US',
+                    include_video: true,
+                    language: 'fr_FR',
                     page: 1,
                     sort_by: 'popularity.desc',
                     with_release_type: '2|3',

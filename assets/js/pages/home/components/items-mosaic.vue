@@ -2,18 +2,20 @@
     <div class="tw-flex tw-flex-col tw-items-center tw-w-full tw-my-8">
         <h2 class="tw-text-5xl tw-my-5">Upcoming {{ type }}</h2>
 
-        <div class="tw-flex tw-justify-center">
+        <div class="tw-flex tw-flex-col tw-justify-center tw-items-center">
+            <div class="tw-text-white">params <v-icon color="white">mdi-check</v-icon></div>
+
             <div v-if="loading">Loading...</div>
 
-            <div v-else class="tw-grid tw-grid-cols-5 tw-gap-2">
-
+            <div v-else class="tw-grid tw-grid-cols-5 tw-gap-4">
                 <div v-for="(item, index) in items" :key="index"
-                     class="tw-col-span-1 tw-flex tw-justify-center tw-items-center tw-p-5 tw-gap-2 tw-w-[13.75rem] tw-h-[20.625rem] tw-rounded-xl !tw-bg-cover !tw-bg-center hover:tw-opacity-60"
+                     class="tw-col-span-1 tw-w-[13.75rem] tw-h-[20.625rem] tw-rounded-xl !tw-bg-cover !tw-bg-center"
                      :style="`background:url('` + getUrl(item[apiInfos.specificInfos.posterParamName]) + `');`"
                     @mouseover="hovered[index] = true" @mouseout="hovered[index] = false">
 
-                    <div v-if="hovered[index] === true" class="tw-text-white text-center tw-opacity-100">
-                        <div>{{ item[apiInfos.specificInfos.titleParamName] }}</div>
+                    <div v-show="hovered[index] === true"
+                         class="tw-flex tw-flex-col tw-justify-center tw-items-center tw-gap-2 tw-p-5 text-center tw-bg-white tw-bg-opacity-60 tw-h-full tw-w-full tw-rounded-xl">
+                        <div class="tw-font-black">{{ item[apiInfos.specificInfos.titleParamName] }}</div>
                         <div>{{ frenchizeDate(item[apiInfos.specificInfos.dateParamName]) }}</div>
                     </div>
                 </div>

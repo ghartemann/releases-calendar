@@ -4,6 +4,7 @@
             <h1 class="tw-text-9xl tw-text-center">Releases calendar</h1>
 
             <items-mosaic :api-infos="apiInfos.movies" type="movies"></items-mosaic>
+            <items-mosaic :api-infos="apiInfos.tv" type="tv"></items-mosaic>
             <items-mosaic :api-infos="apiInfos.games" type="games"></items-mosaic>
         </div>
     </div>
@@ -38,6 +39,25 @@ export default defineComponent({
                     with_release_type: '2|3',
                     'primary_release_date.gte': new moment().format('YYYY-MM-DD'),
                     'primary_release_date.lte': new moment().add(6, 'months').format('YYYY-MM-DD'),
+                    api_key: process.env.TMDB_API_KEY
+                }
+            },
+            tv: {
+                specificInfos: {
+                    url: 'https://api.themoviedb.org/3/discover/tv',
+                    urlPosters: 'https://www.themoviedb.org/t/p/w440_and_h660_face',
+                    dateParamName: 'release_date',
+                    posterParamName: 'poster_path',
+                    titleParamName: 'name',
+                },
+                params: {
+                    include_adult: false,
+                    include_video: true,
+                    language: 'en_US',
+                    page: 1,
+                    sort_by: 'popularity.desc',
+                    'first_air_date.gte': new moment().format('YYYY-MM-DD'),
+                    'first_air_date.lte': new moment().add(6, 'months').format('YYYY-MM-DD'),
                     api_key: process.env.TMDB_API_KEY
                 }
             },

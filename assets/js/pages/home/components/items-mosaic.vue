@@ -1,17 +1,20 @@
 <template>
-    <div class="tw-flex tw-flex-col tw-items-center tw-w-full">
-        <h2>Upcoming {{ type }}</h2>
+    <div class="tw-flex tw-flex-col tw-items-center tw-w-full tw-my-8">
+        <h2 class="tw-text-5xl tw-my-5">Upcoming {{ type }}</h2>
 
         <div class="tw-flex tw-justify-center">
             <div v-if="loading">Loading...</div>
 
-            <div v-else class="tw-flex tw-justify-center tw-gap-2 tw-flex-wrap">
-                <div v-for="(item, index) in items" :key="index"
-                     class="tw-flex tw-justify-center tw-items-end tw-p-5 tw-gap-2 tw-w-[13.75rem] tw-h-[20.625rem] tw-rounded-xl !tw-bg-cover hover:tw-opacity-60"
-                     :style="`background:url('` + getUrl(item.poster_path) + `');`">
+            <div v-else class="tw-grid tw-grid-cols-5 tw-gap-2">
 
-                    <div class="tw-absolute tw-text-white text-center">
-                        <div>{{ frenchizeDate(item.release_date) }}</div>
+                <div v-for="(item, index) in items" :key="index"
+                     class="tw-col-span-1 tw-flex tw-justify-center tw-items-center tw-p-5 tw-gap-2 tw-w-[13.75rem] tw-h-[20.625rem] tw-rounded-xl !tw-bg-cover !tw-bg-center hover:tw-opacity-60"
+                     :style="`background:url('` + getUrl(item[apiInfos.specificInfos.posterParamName]) + `');`"
+                    @mouseover="hovered[index] = true" @mouseout="hovered[index] = false">
+
+                    <div v-if="hovered[index] === true" class="tw-text-white text-center tw-opacity-100">
+                        <div>{{ item[apiInfos.specificInfos.titleParamName] }}</div>
+                        <div>{{ frenchizeDate(item[apiInfos.specificInfos.dateParamName]) }}</div>
                     </div>
                 </div>
             </div>
@@ -39,6 +42,7 @@ export default defineComponent({
     data: () => ({
         items: [],
         source: '',
+        hovered: [],
         loading: false
     }),
     created() {
@@ -59,6 +63,8 @@ export default defineComponent({
                         this.source = 'db';
 
                         this.items = r.data.content;
+
+                        this.hovered = [...new Array(this.items.length)].map(x => false);
                     }
                 }
             }).catch((error) => {
@@ -75,6 +81,8 @@ export default defineComponent({
 
                 this.items = r.data.results;
                 this.sortByDate(this.items, this.apiInfos.specificInfos.dateParamName);
+
+                this.hovered = [...new Array(this.items.length)].map(x => false);
 
                 this.saveItemsToDb();
             }).catch((error) => {
@@ -96,9 +104,9 @@ export default defineComponent({
         frenchizeDate(date) {
             return new moment(date).format('DD/MM/YYYY');
         },
-        sortByDate(items, parameter) {
+        sortByDate(items, date) {
             return items.sort((a,b) => {
-                return new Date(a[parameter]) - new Date(b[parameter]);
+                return new Date(a[date]) - new Date(b[date]);
             });
         }
     }

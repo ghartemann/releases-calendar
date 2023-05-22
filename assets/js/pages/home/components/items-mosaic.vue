@@ -10,9 +10,9 @@
             <div v-else
                  class="tw-grid xl:tw-grid-cols-5 lg:tw-grid-cols-4 md:tw-grid-cols-3 sm:tw-grid-cols-2 tw-gap-4">
                 <div v-for="(item, index) in items" :key="index"
-                     @click="contentModal = true"
+                     @click="showModal(item)"
                      class="tw-col-span-1 tw-w-[13.75rem] tw-h-[20.625rem] tw-rounded-xl !tw-bg-cover !tw-bg-center tw-relative tw-cursor-pointer"
-                     :style="`background:url('` + getUrl(item[apiInfos.specificInfos.posterParamName]) + `');`"
+                     :style="`background:url('` + getUrl(item[apiInfos.specificInfos.posterParamName], 'urlPosters') + `');`"
                      @mouseover="hovered[index] = true" @mouseout="hovered[index] = false">
 
                     <div class="tw-flex tw-flex-col tw-justify-between tw-items-center tw-gap-2 tw-p-5 text-center tw-text-white hover:tw-bg-black hover:tw-bg-opacity-50 tw-h-full tw-w-full tw-rounded-xl"
@@ -26,7 +26,7 @@
 
                         <div>
                             <!-- TODO: cacher le bouton + quand pas de hover-->
-                            <v-btn @click="addOrRemoveFromMyList(item)"
+                            <v-btn @click.stop="addOrRemoveFromMyList(item)"
                                    v-show="hovered[index] || myList.includes(item)"
                                    :color="myList.includes(item) === true ? 'black' : ''"
                                    icon flat
@@ -43,12 +43,26 @@
         </div>
     </div>
 
+    <!-- TODO: passer ça en composant-->
     <v-dialog v-model="contentModal"
               transition="dialog-bottom-transition"
-              width="90%">
-        <v-card class="tw-p-4 !tw-rounded-2xl">
-            <v-card-text class="tw-flex tw-flex-col tw-items-center">
-                coucou
+              width="70%" max-height="80vh">
+        <v-card class="!tw-rounded-2xl">
+            <v-card-text class="tw-flex tw-flex-col tw-items-center !tw-p-0">
+                <div :style="`background:url('` + getUrl(activeItemDetails['backdrop_path'], 'urlPosters') + `');`" class="tw-flex tw-w-full tw-bg-contain tw-bg-no-repeat">
+                    <img :src="getUrl(activeItemDetails['poster_path'], 'urlPosters')"
+                         class="tw-w-1/3 tw-h-1/3 tw-rounded-xl tw-m-5 tw-shadow-2xl"
+                         alt="poster">
+
+                    <div class="tw-flex tw-flex-col">
+                        <h4 class="tw-text-2xl tw-font-semibold tw-bg-black tw-rounded-xl">{{ activeItemDetails.title }}</h4>
+
+                        <div class="tw-text-white">
+                            <h5 class="tw-text-xl tw-text-black tw-font-semibold">Overview</h5>
+                            <div>{{ activeItemDetails.overview }}</div>
+                        </div>
+                    </div>
+                </div>
             </v-card-text>
         </v-card>
     </v-dialog>
@@ -73,6 +87,9 @@ export default defineComponent({
     },
     data: () => ({
         items: [],
+        activeItem: {},
+        activeItemDetails: {},
+        loadingActiveItemDetails: false,
         source: '',
         hovered: [],
         myList: [],
@@ -132,12 +149,25 @@ export default defineComponent({
                 console.error(error);
             });
         },
-        getUrl(posterPath) {
-            if (posterPath === null) {
+        getActiveItemDetails() {
+            this.loadingActiveItemDetails = true;
+
+            if (this.apiInfos.specificInfos.urlDetails) {
+                axios.get(this.apiInfos.specificInfos.urlDetails + this.activeItem.id, {params: this.apiInfos.detailsParams}).then((r) => {
+                    this.activeItemDetails = r.data;
+                }).catch((error) => {
+                    console.error(error);
+                }).finally(() => {
+                    this.loadingActiveItemDetails = false;
+                });
+            }
+        },
+        getUrl(path, type) {
+            if (path === null) {
                 return 'https://via.placeholder.com/500x750?text=No+poster';
             }
 
-            return this.apiInfos.specificInfos.urlPosters + posterPath;
+            return this.apiInfos.specificInfos[type] + path;
         },
         frenchizeDate(date) {
             return new moment(date).format('DD/MM/YYYY');
@@ -153,6 +183,10 @@ export default defineComponent({
             } else {
                 this.myList.push(item);
             }
+        },
+        showModal(item) {
+            this.contentModal = true;
+            this.activeItem = item;
         }
     },
     watch: {
@@ -161,6 +195,9 @@ export default defineComponent({
                 this.getItemsFromDb();
             },
             deep: true
+        },
+        activeItem(val) {
+            this.getActiveItemDetails(val);
         }
     }
 })

@@ -1,10 +1,6 @@
 <template>
     <div class="tw-flex tw-flex-col tw-items-center tw-w-full tw-my-8">
         <div class="tw-flex tw-flex-col tw-justify-center tw-items-center">
-            <!--            <div class="tw-text-white">params-->
-            <!--                <v-icon color="white">mdi-check</v-icon>-->
-            <!--            </div>-->
-
             <div v-if="loading">Loading...</div>
 
             <div v-else
@@ -45,24 +41,40 @@
 
     <!-- TODO: passer ça en composant-->
     <v-dialog v-model="contentModal"
-              transition="dialog-bottom-transition"
-              width="70%" max-height="80vh">
-        <v-card class="!tw-rounded-2xl">
-            <v-card-text class="tw-flex tw-flex-col tw-items-center !tw-p-0">
-                <div :style="`background:url('` + getUrl(activeItemDetails['backdrop_path'], 'urlPosters') + `');`" class="tw-flex tw-w-full tw-bg-contain tw-bg-no-repeat">
-                    <img :src="getUrl(activeItemDetails['poster_path'], 'urlPosters')"
-                         class="tw-w-1/3 tw-h-1/3 tw-rounded-xl tw-m-5 tw-shadow-2xl"
-                         alt="poster">
+              transition="dialog-top-transition"
+              width="90%">
+        <v-card class="!tw-rounded-2xl tw-shadow-2xl tw-h-[80vh]">
+            <v-card-text v-if="clickedLink === false" class="tw-flex tw-flex-col tw-items-center !tw-p-0">
+                <div :style="`background:url('` + getUrl(activeItemDetails['backdrop_path'], 'urlBackdrops') + `');`"
+                     class="tw-w-full !tw-bg-cover !tw-bg-center">
+                    <div class="tw-bg-black tw-bg-opacity-50 tw-grid tw-grid-cols-4 tw-gap-5 tw-p-5">
+                        <div class="tw-col-span-1 tw-flex tw-flex-col tw-items-center tw-gap-3">
+                            <img :src="getUrl(activeItemDetails['poster_path'], 'urlPosters')"
+                                 class="tw-rounded-xl tw-shadow-2xl"
+                                 alt="poster">
 
-                    <div class="tw-flex tw-flex-col">
-                        <h4 class="tw-text-2xl tw-font-semibold tw-bg-black tw-rounded-xl">{{ activeItemDetails.title }}</h4>
+                            <div class="tw-text-white tw-underline tw-cursor-pointer" @click="clickedLink = true">Watch trailer</div>
+                        </div>
 
-                        <div class="tw-text-white">
-                            <h5 class="tw-text-xl tw-text-black tw-font-semibold">Overview</h5>
-                            <div>{{ activeItemDetails.overview }}</div>
+                        <div class="tw-col-span-3 tw-flex tw-flex-col tw-gap-5">
+                            <h4 class="tw-text-2xl tw-font-semibold tw-bg-black tw-rounded-xl">
+                                {{ activeItemDetails.title }}
+                            </h4>
+
+                            <div class="tw-text-white">{{ activeItemDetails.overview }}</div>
                         </div>
                     </div>
                 </div>
+            </v-card-text>
+
+            <v-card-text v-else class="!tw-p-0">
+                <iframe
+                        width="100%"
+                        height="100%"
+                        :src="'https://www.youtube.com/embed/' + activeItemDetails.videos.results[0].key + '?autoplay=1'"
+                        title="YouTube video player"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen>
+                </iframe>
             </v-card-text>
         </v-card>
     </v-dialog>
@@ -90,6 +102,7 @@ export default defineComponent({
         activeItem: {},
         activeItemDetails: {},
         loadingActiveItemDetails: false,
+        clickedLink: false,
         source: '',
         hovered: [],
         myList: [],

@@ -2,9 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Oswald&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
 
-h1, h2 {
-    font-family: Oswald, sans-serif;
+#gradient {
+    min-height: 100vh !important;
+}
+
+h1, h2, h3, h4, h5 {
+    font-family: Quicksand, sans-serif;
     color: white;
 }

@@ -7,7 +7,7 @@ const routes = [
     {
         path: "/",
         name: "homepage",
-        component: Home,
+        component: Home
     },
     // insert new routes here
     {

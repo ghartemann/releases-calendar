@@ -1,4 +1,4 @@
-# Releases calendar
+# ReleaseProphet
 
 I've just started this project. Its purpose is to centralize information regarding movies, TV and video games release dates in one single place, and a bit later to synchronize everything with your Google Calendar.
 

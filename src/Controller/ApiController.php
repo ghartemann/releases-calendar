@@ -4,8 +4,11 @@ namespace App\Controller;
 
 use App\Entity\Upcoming;
 use App\Entity\User;
+use App\Exception\AppException;
 use App\Repository\UpcomingRepository;
 use App\Repository\UserRepository;
+use App\Service\Api\Connector\TmdbApiConnector;
+use App\Service\ApiService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,15 +21,13 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 class ApiController extends AbstractController
 {
     #[Route('/save-upcoming-{type}', name: 'create_upcoming')]
-    public function saveUpcoming(string $type, Request $request, UpcomingRepository $upcomingRepository): JsonResponse
+    public function saveUpcoming(string $type, array $data, UpcomingRepository $upcomingRepository): JsonResponse
     {
-        $infos = $request->toArray();
-
         $upcoming = new Upcoming();
         $upcoming
             ->setType($type)
             ->setCreatedAt(new \DateTimeImmutable())
-            ->setContent($infos['items']);
+            ->setContent($data);
 
         $upcomingRepository->save($upcoming, true);
 
@@ -34,15 +35,42 @@ class ApiController extends AbstractController
     }
 
     #[Route('/get-upcoming-{type}', name: 'get_upcoming')]
-    public function getUpcoming(string $type, UpcomingRepository $upcomingRepository): JsonResponse
+    public function getUpcoming(
+        string $type,
+        UpcomingRepository $upcomingRepository,
+        ApiService $apiService,
+        TmdbApiConnector $tmdbApiConnector,
+        Request $request
+    ): JsonResponse
     {
-        $upcoming = $upcomingRepository->findBy(['type' => $type], ['createdAt' => 'DESC'], 1);
+        $upcoming = [];
+        $params = $request->toArray();
+        $dbDataDirty = $apiService->isDbDataDirtyOrMissing($upcomingRepository, $type);
+
+        if ($dbDataDirty === true) {
+            switch ($type) {
+                case 'movies':
+                    $upcoming = $tmdbApiConnector->fetchUpcoming($params, 'https://api.themoviedb.org/3/discover/movie');
+                    break;
+                case 'tv':
+                    // do something
+                case 'games':
+                    // do something
+                default:
+                    throw new AppException('Invalid type');
+            }
+
+        } else {
+            $upcoming = $upcomingRepository->findBy(['type' => $type], ['createdAt' => 'DESC'], 1)[0];
+            $this->saveUpcoming($type, $request, $upcomingRepository);
+        }
+
 
         if (empty($upcoming)) {
             return new JsonResponse();
         }
 
-        return $this->json($upcoming[0], 200, [], ['groups' => ['movies']]);
+        return $this->json($upcoming, 200, [], ['groups' => ['movies']]);
     }
 
     #[Route('/register', name: 'register')]
@@ -81,5 +109,13 @@ class ApiController extends AbstractController
             'last_username' => $lastUsername,
             'error' => $error,
         ]);
+    }
+
+    #[Route('/test', name: 'test')]
+    public function test(TmdbApiConnector $tmdbApiConnector, Request $request): JsonResponse
+    {
+        $params = $request->toArray();
+
+        return new JsonResponse($tmdbApiConnector->fetchUpcoming($params, 'https://api.themoviedb.org/3/discover/movie'));
     }
 }

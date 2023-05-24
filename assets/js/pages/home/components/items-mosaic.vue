@@ -102,31 +102,21 @@ export default defineComponent({
         source: '',
         hovered: [],
         myList: [],
+        test: [],
         loading: false,
         contentModal: false
     }),
     created() {
-        this.getItemsFromDb();
+        this.getItems();
     },
     methods: {
-        getItemsFromDb() {
+        getItems() {
             this.loading = true;
-            let itemsTooRecent = false;
 
-            axios.get('/api/get-upcoming-' + this.type).then((r) => {
-                if (r.data !== null) {
-                    itemsTooRecent = new moment().diff(new moment(r.data.createdAt), 'hours') < 12;
+            axios.post('/api/get-upcoming-' + this.type, {data: this.apiInfos.params}).then((r) => {
+                this.items = r.data.content;
 
-                    if (Object.keys(r.data).length === 0 || itemsTooRecent === false) {
-                        this.getItemsFromApi();
-                    } else {
-                        this.source = 'db';
-
-                        this.items = r.data.content;
-
-                        this.hovered = [...new Array(this.items.length)].map(x => false);
-                    }
-                }
+                this.hovered = [...new Array(this.items.length)].map(x => false);
             }).catch((error) => {
                 console.error(error);
             }).finally(() => {
@@ -151,6 +141,7 @@ export default defineComponent({
                 this.loading = false;
             });
         },
+
         saveItemsToDb() {
             axios.post('/api/save-upcoming-' + this.type, {items: this.items}).then((r) => {
 

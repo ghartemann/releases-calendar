@@ -1,4 +1,5 @@
-/** @type {import('tailwindcss').Config} */
+const colors = require('tailwindcss/colors')
+
 module.exports = {
     content: [
         "./assets/**/*.js",
@@ -7,7 +8,13 @@ module.exports = {
     ],
     prefix: "tw-",
     theme: {
-        extend: {},
+        extend: {
+            colors: {
+                'accent': colors.rose[400]
+            }
+        },
     },
-    plugins: [],
+    plugins: [
+        require('@tailwindcss/aspect-ratio'),
+    ],
 }

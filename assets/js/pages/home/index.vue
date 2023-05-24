@@ -1,11 +1,9 @@
 <template>
-    <app-bar></app-bar>
-
-    <div class="tw-container tw-mx-auto tw-pt-5">
+    <div class="tw-container tw-mx-auto tw-pt-20">
         <div class="tw-flex tw-flex-col tw-justify-center tw-items-center">
             <h1 class="tw-text-7xl tw-font-semibold tw-text-center">
-                All your <span class="tw-text-amber-500">release</span> date<br>
-                information in <span class="tw-text-amber-500">one</span> place.
+                All your <span class="tw-text-accent">release</span> date<br>
+                information in <span class="tw-text-accent">one</span> place.
             </h1>
 
             <div class="tw-flex tw-gap-3 tw-w-fit tw-items-center tw-mt-16">
@@ -37,8 +35,6 @@ export default defineComponent({
     name: "Home",
     components: {AppBar, ItemsMosaic},
     data: () => ({
-        upcomingMovies: [],
-        loadingUpcoming: false,
         displayType: 'movies',
         apiInfos: {
             movies: {
@@ -70,7 +66,9 @@ export default defineComponent({
             tv: {
                 specificInfos: {
                     url: 'https://api.themoviedb.org/3/discover/tv',
+                    urlDetails: 'https://api.themoviedb.org/3/tv/',
                     urlPosters: 'https://www.themoviedb.org/t/p/w440_and_h660_face',
+                    urlBackdrops: 'https://www.themoviedb.org/t/p/w1920_and_h800_multi_faces',
                     dateParamName: 'release_date',
                     posterParamName: 'poster_path',
                     titleParamName: 'name',
@@ -84,11 +82,16 @@ export default defineComponent({
                     'first_air_date.gte': new moment().format('YYYY-MM-DD'),
                     'first_air_date.lte': new moment().add(6, 'months').format('YYYY-MM-DD'),
                     api_key: process.env.TMDB_API_KEY
+                },
+                detailsParams: {
+                    append_to_response: 'credits,videos',
+                    api_key: process.env.TMDB_API_KEY
                 }
             },
             games: {
                 specificInfos: {
                     url: 'https://api.rawg.io/api/games',
+                    urlDetails: 'https://api.rawg.io/api/games/',
                     urlPosters: '',
                     dateParamName: 'released',
                     posterParamName: 'background_image',

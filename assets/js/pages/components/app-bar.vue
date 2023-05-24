@@ -1,10 +1,16 @@
 <template>
     <div class="tw-flex tw-justify-between tw-p-3">
-        <h3 class="tw-text-white tw-font-bold tw-text-3xl">
-            Release<span class="tw-text-amber-500">Prophet</span>
-        </h3>
+        <div class="tw-flex tw-gap-10 tw-items-baseline">
+            <router-link class="tw-text-white tw-font-bold tw-text-3xl" :to="{name: 'homepage'}">
+                <h3>Release<span class="tw-text-accent">Prophet</span></h3>
+            </router-link>
 
-        <h3 class="tw-text-2xl tw-cursor-pointer">
+            <router-link v-for="link in links" :to="{name: link.routeName}">
+                <h4 class="tw-text-2xl">{{ link.displayName }}</h4>
+            </router-link>
+        </div>
+
+        <h4 class="tw-text-2xl tw-cursor-pointer">
             Login
             <v-dialog v-model="loginModal"
                       activator="parent"
@@ -41,7 +47,7 @@
                     </v-card-text>
                 </v-card>
             </v-dialog>
-        </h3>
+        </h4>
     </div>
 </template>
 
@@ -57,7 +63,17 @@ export default defineComponent({
         loginForm: {
             email: '',
             password: ''
-        }
+        },
+        links: [
+            {
+                routeName: 'homepage',
+                displayName: 'Releases'
+            },
+            {
+                routeName: 'calendar',
+                displayName: 'Calendar'
+            }
+        ]
     }),
     methods: {
         accountLogin() {

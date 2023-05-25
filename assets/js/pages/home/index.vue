@@ -1,5 +1,5 @@
 <template>
-    <div class="tw-container tw-mx-auto tw-pt-20">
+    <div class="tw-container tw-mx-auto tw-py-20">
         <div class="tw-flex tw-flex-col tw-justify-center tw-items-center">
             <h1 class="tw-text-7xl tw-font-semibold tw-text-center">
                 All your <span class="tw-text-accent">release</span> date<br>

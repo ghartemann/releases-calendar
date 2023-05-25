@@ -10,11 +10,7 @@ class ApiService
     {
         $upcoming = $upcomingRepository->findBy(['type' => $type], ['createdAt' => 'DESC'], 1);
 
-        if (empty($upcoming)) {
-            return true;
-        }
-
-        return $upcoming[0]->getCreatedAt()->diff(new \DateTimeImmutable())->days > 1;
+        return empty($upcoming) || $upcoming[0]->getCreatedAt()->diff(new \DateTimeImmutable())->days > 1;
     }
 
     public function sortDataByDate(array $data): array

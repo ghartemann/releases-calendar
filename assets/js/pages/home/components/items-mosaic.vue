@@ -123,32 +123,7 @@ export default defineComponent({
                 this.loading = false;
             });
         },
-        getItemsFromApi() {
-            this.loading = true;
-
-            axios.get(this.apiInfos.specificInfos.url, {params: this.apiInfos.params}).then((r) => {
-                this.source = 'api';
-
-                this.items = r.data.results;
-                this.sortByDate(this.items, this.apiInfos.specificInfos.dateParamName);
-
-                this.hovered = [...new Array(this.items.length)].map(x => false);
-
-                this.saveItemsToDb();
-            }).catch((error) => {
-                console.error(error);
-            }).finally(() => {
-                this.loading = false;
-            });
-        },
-
-        saveItemsToDb() {
-            axios.post('/api/save-upcoming-' + this.type, {items: this.items}).then((r) => {
-
-            }).catch((error) => {
-                console.error(error);
-            });
-        },
+        //TODO: passer ça en back aussi
         getActiveItemDetails() {
             if (this.apiInfos.specificInfos.urlDetails) {
                 this.loadingActiveItemDetails = true;
@@ -175,11 +150,6 @@ export default defineComponent({
         frenchizeDate(date) {
             return new moment(date).format('DD/MM/YYYY');
         },
-        sortByDate(items, date) {
-            return items.sort((a, b) => {
-                return new Date(a[date]) - new Date(b[date]);
-            });
-        },
         addOrRemoveFromMyList(item) {
             if (this.myList.includes(item)) {
                 this.myList.splice(this.myList.indexOf(item), 1);
@@ -195,7 +165,7 @@ export default defineComponent({
     watch: {
         apiInfos: {
             handler() {
-                this.getItemsFromDb();
+                this.getItems();
             },
             deep: true
         },

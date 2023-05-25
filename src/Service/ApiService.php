@@ -16,4 +16,13 @@ class ApiService
 
         return $upcoming[0]->getCreatedAt()->diff(new \DateTimeImmutable())->days > 1;
     }
+
+    public function sortDataByDate(array $data): array
+    {
+        usort($data, function ($a, $b) {
+            return $a['release_date'] <=> $b['release_date'];
+        });
+
+        return $data;
+    }
 }

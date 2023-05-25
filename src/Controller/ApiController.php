@@ -43,7 +43,6 @@ class ApiController extends AbstractController
         Request $request
     ): JsonResponse
     {
-        $upcoming = [];
         $params = $request->toArray();
         $dbDataDirty = $apiService->isDbDataDirtyOrMissing($upcomingRepository, $type);
 
@@ -53,16 +52,17 @@ class ApiController extends AbstractController
                     $upcoming = $tmdbApiConnector->fetchUpcoming($params, 'https://api.themoviedb.org/3/discover/movie');
                     break;
                 case 'tv':
-                    // do something
+                    $upcoming = $tmdbApiConnector->fetchUpcoming($params, 'https://api.themoviedb.org/3/discover/tv');
+                    break;
                 case 'games':
                     // do something
                 default:
                     throw new AppException('Invalid type');
             }
 
+            $this->saveUpcoming($type, $upcoming, $upcomingRepository);
         } else {
             $upcoming = $upcomingRepository->findBy(['type' => $type], ['createdAt' => 'DESC'], 1)[0];
-            $this->saveUpcoming($type, $request, $upcomingRepository);
         }
 
 
@@ -70,7 +70,7 @@ class ApiController extends AbstractController
             return new JsonResponse();
         }
 
-        return $this->json($upcoming, 200, [], ['groups' => ['movies']]);
+        return $this->json($upcoming);
     }
 
     #[Route('/register', name: 'register')]

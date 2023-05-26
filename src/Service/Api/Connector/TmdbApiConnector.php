@@ -6,14 +6,17 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class TmdbApiConnector extends AbstractApiConnector
 {
-    public function __construct(private readonly HttpClientInterface $client)
+    public function __construct(
+        private readonly HttpClientInterface $client,
+        private readonly string $url = "https://api.themoviedb.org"
+    )
     {
     }
 
 
-    public function fetchUpcoming(array $params, string $url): array
+    public function fetchUpcoming(array $params, string $urlComplement): array
     {
-        $response = $this->client->request('GET', $url, [
+        $response = $this->client->request('GET', $this->url . $urlComplement, [
             'headers' => [
                 'Authorization' => 'Bearer ' . $_ENV['TMDB_HEADER'],
                 'accept' => 'application/json',
@@ -22,10 +25,6 @@ class TmdbApiConnector extends AbstractApiConnector
         ]);
 
         $data = $response->toArray()['results'];
-
-        usort($data, function ($a, $b) {
-            return $a['first_air_date'] <=> $b['first_air_date'];
-        });
 
         return $data;
     }

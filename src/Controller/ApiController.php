@@ -49,10 +49,12 @@ class ApiController extends AbstractController
         if ($dbDataDirty === true) {
             switch ($type) {
                 case 'movies':
-                    $upcoming = $tmdbApiConnector->fetchUpcoming($params, 'https://api.themoviedb.org/3/discover/movie');
+                    $upcoming = $tmdbApiConnector->fetchUpcoming($params, '/3/discover/movie');
+
                     break;
                 case 'tv':
-                    $upcoming = $tmdbApiConnector->fetchUpcoming($params, 'https://api.themoviedb.org/3/discover/tv');
+                    $upcoming = $tmdbApiConnector->fetchUpcoming($params, '/3/discover/tv');
+
                     break;
                 case 'games':
                     // do something

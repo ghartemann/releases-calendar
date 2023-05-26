@@ -69,7 +69,7 @@ export default defineComponent({
                     urlDetails: 'https://api.themoviedb.org/3/tv/',
                     urlPosters: 'https://www.themoviedb.org/t/p/w440_and_h660_face',
                     urlBackdrops: 'https://www.themoviedb.org/t/p/w1920_and_h800_multi_faces',
-                    dateParamName: 'release_date',
+                    dateParamName: 'first_air_date',
                     posterParamName: 'poster_path',
                     titleParamName: 'name',
                 },

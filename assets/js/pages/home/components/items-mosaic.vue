@@ -48,28 +48,54 @@
                          class="tw-rounded-xl tw-shadow-2xl"
                          alt="poster">
 
-                    <div class="tw-text-white tw-underline tw-cursor-pointer" @click="clickedLink = true">Watch
-                        trailer
+                    <div class="tw-text-white tw-underline tw-cursor-pointer" @click="clickedLink = true">
+                        Watch trailer
                     </div>
                 </div>
 
                 <div class="tw-col-span-3 tw-flex tw-flex-col tw-gap-5">
                     <h4 class="tw-text-5xl tw-font-semibold tw-rounded-xl">
-                        {{ activeItemDetails.title }}
+                        {{ activeItemDetails[apiInfos.specificInfos.titleParamName] }}
                     </h4>
 
                     <div class="tw-text-white">{{ activeItemDetails.overview }}</div>
+
+                    <div v-if="activeItemDetails.credits">
+                        <h4 class="tw-text-5xl tw-font-semibold tw-rounded-xl">
+                            Cast
+                        </h4>
+
+                        <div class="tw-flex tw-overflow-x-scroll">
+                            <div v-for="castMember in activeItemDetails.credits.cast" class="tw-text-white tw-w-24 tw-flex tw-flex-col tw-items-center">
+                                <div :style="getProfilePicture(castMember.profile_path)"
+                                     class="tw-w-14 tw-h-14 tw-rounded-full tw-shadow-2xl !tw-bg-cover !tw-bg-center tw-mr-2"></div>
+                                <div class="tw-text-xs tw-text-center">{{castMember.name}}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-if="activeItemDetails.credits">
+                        <h4 class="tw-text-5xl tw-font-semibold tw-rounded-xl">
+                            Crew
+                        </h4>
+
+                        <div class="flex">
+                            <div v-for="crewMember in crew" class="tw-text-white">
+                                {{crewMember.name}} - {{crewMember.job}}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </v-card-text>
 
             <v-card-text v-else class="!tw-p-0 tw-aspect-w-16 tw-aspect-h-9">
                 <iframe
-                        width="100%"
-                        height="100%"
-                        :src="'https://www.youtube.com/embed/' + activeItemDetails.videos.results[0].key + '?autoplay=1'"
-                        title="YouTube video player"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        allowfullscreen>
+                    width="100%"
+                    height="100%"
+                    :src="'https://www.youtube.com/embed/' + activeItemDetails.videos.results[0].key + '?autoplay=1'"
+                    title="YouTube video player"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen>
                 </iframe>
             </v-card-text>
         </v-card>
@@ -106,6 +132,39 @@ export default defineComponent({
         loading: false,
         contentModal: false
     }),
+    computed: {
+        crew() {
+            if (this.activeItemDetails.credits) {
+                const crew = [];
+
+                this.activeItemDetails.credits.crew.forEach((crewMember) => {
+                    if (crewMember.job === 'Director') {
+                        crew.push(crewMember);
+                    }
+                });
+
+                this.activeItemDetails.credits.crew.forEach((crewMember) => {
+                    if (crewMember.job === 'Executive producer') {
+                        crew.push(crewMember);
+                    }
+                });
+
+                this.activeItemDetails.credits.crew.forEach((crewMember) => {
+                    if (crewMember.job === 'Producer') {
+                        crew.push(crewMember);
+                    }
+                });
+
+                this.activeItemDetails.credits.crew.forEach((crewMember) => {
+                    if (crewMember.job === 'Writer') {
+                        crew.push(crewMember);
+                    }
+                });
+
+                return crew;
+            }
+        }
+    },
     created() {
         this.getItems();
     },
@@ -115,6 +174,10 @@ export default defineComponent({
 
             axios.post('/api/get-upcoming-' + this.type, {data: this.apiInfos.params}).then((r) => {
                 this.items = r.data.content;
+
+                this.items.sort((a, b) => {
+                    return new Date(a[this.apiInfos.specificInfos.dateParamName]) - new Date(b[this.apiInfos.specificInfos.dateParamName]);
+                });
 
                 this.hovered = [...new Array(this.items.length)].map(x => false);
             }).catch((error) => {
@@ -146,6 +209,9 @@ export default defineComponent({
             }
 
             return this.apiInfos.specificInfos[type] + path;
+        },
+        getProfilePicture(picture) {
+            return "background:url('https://www.themoviedb.org/t/p/w600_and_h900_bestv2/" + picture + "');";
         },
         frenchizeDate(date) {
             return new moment(date).format('DD/MM/YYYY');

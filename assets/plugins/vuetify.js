@@ -5,8 +5,13 @@ import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';
 import 'vuetify/styles';
 
+import { VSkeletonLoader} from "vuetify/labs/components";
+
 const vuetify = createVuetify({
-    components,
+    components: {
+        ...components,
+        VSkeletonLoader
+    },
     directives,
     icons: {
         defaultSet: 'mdi',

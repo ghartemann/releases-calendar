@@ -1,18 +1,22 @@
 <template>
     <div class="tw-flex tw-flex-col tw-items-center tw-w-full tw-my-8">
         <div class="tw-flex tw-flex-col tw-justify-center tw-items-center">
-            <div v-if="loading">Loading...</div>
+            <div class="tw-grid xl:tw-grid-cols-5 lg:tw-grid-cols-4 md:tw-grid-cols-3 sm:tw-grid-cols-2 tw-gap-4 tw-w-full">
+                <v-skeleton-loader
+                        v-if="loading"
+                        v-for="index in 40"
+                        :width="220" :height="330" :loading="loading"
+                        class="tw-col-span-1 tw-rounded-xl ">
+                    {{ index }}
+                </v-skeleton-loader>
 
-            <div v-else
-                 class="tw-grid xl:tw-grid-cols-5 lg:tw-grid-cols-4 md:tw-grid-cols-3 sm:tw-grid-cols-2 tw-gap-4">
-                <div v-for="(item, index) in items" :key="index"
+                <div v-else v-for="(item, index) in items" :key="index"
                      @click="showModal(item)"
                      class="tw-col-span-1 tw-w-[13.75rem] tw-h-[20.625rem] tw-rounded-xl !tw-bg-cover !tw-bg-center tw-relative tw-cursor-pointer"
                      :style="`background:url('` + getUrl(item[apiInfos.specificInfos.posterParamName], 'urlPosters') + `');`"
                      @mouseover="hovered[index] = true" @mouseout="hovered[index] = false">
 
-                    <div class="tw-flex tw-flex-col tw-justify-between tw-items-center tw-gap-2 tw-p-5 text-center tw-text-white hover:tw-bg-black hover:tw-bg-opacity-50 tw-h-full tw-w-full tw-rounded-xl"
-                    >
+                    <div class="tw-flex tw-flex-col tw-justify-between tw-items-center tw-gap-2 tw-p-5 text-center tw-text-white hover:tw-bg-black hover:tw-bg-opacity-50 tw-h-full tw-w-full tw-rounded-xl">
                         <div></div>
 
                         <div v-show="hovered[index]">
@@ -23,8 +27,7 @@
                         <v-btn @click.stop="addOrRemoveFromMyList(item)"
                                v-show="hovered[index] || myList.includes(item)"
                                :color="myList.includes(item) === true ? '#0f2027' : ''"
-                               icon flat
-                        >
+                               icon flat>
                             <v-icon color="white">
                                 {{ myList.includes(item) === false ? 'mdi-plus' : 'mdi-heart' }}
                             </v-icon>
@@ -220,6 +223,8 @@ export default defineComponent({
 })
 </script>
 
-<style scoped>
-
+<style lang="scss">
+.v-skeleton-loader__image.v-skeleton-loader__bone {
+    height: 100%;
+}
 </style>

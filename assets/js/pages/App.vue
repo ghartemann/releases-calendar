@@ -1,8 +1,10 @@
 <template>
     <div id="gradient">
+<!--        <v-app>-->
         <app-bar></app-bar>
 
         <router-view></router-view>
+<!--        </v-app>-->
     </div>
 </template>
 

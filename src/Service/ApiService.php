@@ -6,9 +6,9 @@ use App\Repository\UpcomingRepository;
 
 class ApiService
 {
-    public function isDbDataDirtyOrMissing(UpcomingRepository $upcomingRepository, string $type): bool
+    public function isDbDataDirtyOrMissing(UpcomingRepository $upcomingRepository, string $type, int $period): bool
     {
-        $upcoming = $upcomingRepository->findBy(['type' => $type], ['createdAt' => 'DESC'], 1);
+        $upcoming = $upcomingRepository->findBy(['type' => $type, 'period' => $period], ['createdAt' => 'DESC'], 1);
 
         return empty($upcoming) || $upcoming[0]->getCreatedAt()->diff(new \DateTimeImmutable())->days > 1;
     }

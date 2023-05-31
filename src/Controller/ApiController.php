@@ -34,9 +34,10 @@ class ApiController extends AbstractController
         return new JsonResponse();
     }
 
-    #[Route('/get-upcoming-{type}', name: 'get_upcoming')]
+    #[Route('/get-upcoming-{type}-{period}-months', name: 'get_upcoming')]
     public function getUpcoming(
         string $type,
+        int $period,
         UpcomingRepository $upcomingRepository,
         ApiService $apiService,
         TmdbApiConnector $tmdbApiConnector,
@@ -44,7 +45,7 @@ class ApiController extends AbstractController
     ): JsonResponse
     {
         $params = $request->toArray();
-        $dbDataDirty = $apiService->isDbDataDirtyOrMissing($upcomingRepository, $type);
+        $dbDataDirty = $apiService->isDbDataDirtyOrMissing($upcomingRepository, $type, $period);
 
         if ($dbDataDirty === true) {
             switch ($type) {
@@ -64,9 +65,14 @@ class ApiController extends AbstractController
 
             $this->saveUpcoming($type, $upcoming, $upcomingRepository);
         } else {
-            $upcoming = $upcomingRepository->findBy(['type' => $type], ['createdAt' => 'DESC'], 1)[0];
+            $upcoming = $upcomingRepository->findBy(
+                ['type' => $type, 'period' => $period],
+                ['createdAt' => 'DESC'],
+                1
+            )[0];
         }
 
+        // ICI sauvegarder les données + savoir si je les choppe depuis la bdd après ou j'envoie direct ?
 
         if (empty($upcoming)) {
             return new JsonResponse();

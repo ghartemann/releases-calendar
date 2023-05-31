@@ -26,6 +26,9 @@ class Upcoming
     #[ORM\Column]
     private array $content = [];
 
+    #[ORM\Column]
+    private ?int $period = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -63,6 +66,18 @@ class Upcoming
     public function setContent(array $content): self
     {
         $this->content = $content;
+
+        return $this;
+    }
+
+    public function getPeriod(): ?int
+    {
+        return $this->period;
+    }
+
+    public function setPeriod(int $period): self
+    {
+        $this->period = $period;
 
         return $this;
     }

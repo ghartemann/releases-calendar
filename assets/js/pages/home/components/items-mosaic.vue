@@ -4,16 +4,9 @@
             <div class="tw-grid xl:tw-grid-cols-5 lg:tw-grid-cols-4 md:tw-grid-cols-3 sm:tw-grid-cols-2 tw-gap-4 tw-w-full">
                 <v-skeleton-loader
                         v-if="loading"
-<<<<<<< HEAD
                         v-for="index in itemsToDisplay"
                         width="220" height="330" :loading="loading"
                         class="tw-col-span-1 tw-rounded-xl tw-w-[13.75rem] tw-h-[20.625rem]">
-=======
-                        v-for="index in 40"
-                        :width="220" :height="330" :loading="loading"
-                        class="tw-col-span-1 tw-rounded-xl ">
-                    {{ index }}
->>>>>>> 7e73ac5 (save)
                 </v-skeleton-loader>
 
                 <div v-else v-for="(item, index) in items" :key="index"

@@ -1,38 +1,33 @@
 <template>
-    <div class="tw-flex tw-justify-center tw-w-full tw-my-8">
-        <div class="tw-flex tw-flex-col tw-justify-center tw-items-center">
-            <div class="tw-grid xl:tw-grid-cols-5 lg:tw-grid-cols-4 md:tw-grid-cols-3 sm:tw-grid-cols-2 tw-gap-4 tw-w-full">
-                <v-skeleton-loader
-                        v-if="loading"
-                        v-for="index in itemsToDisplay"
-                        width="220" height="330" :loading="loading"
-                        class="tw-col-span-1 tw-rounded-xl tw-w-[13.75rem] tw-h-[20.625rem]">
-                </v-skeleton-loader>
+    <div class="tw-w-full tw-flex tw-flex-col tw-gap-4">
+        <div v-for="(item, index) in items" :key="index" class="tw-flex tw-gap-4">
+            <v-skeleton-loader
+                    v-if="loading"
+                    width="220" height="330" :loading="loading"
+                    class="tw-col-span-1 tw-rounded-xl tw-w-[13.75rem] tw-h-[20.625rem]">
+            </v-skeleton-loader>
 
-                <div v-else v-for="(item, index) in items" :key="index"
-                     @click="showModal(item)"
-                     class="tw-col-span-1 tw-w-[13.75rem] tw-h-[20.625rem] tw-rounded-xl !tw-bg-cover !tw-bg-center tw-relative tw-cursor-pointer"
-                     :style="`background:url('` + getUrl(item[apiInfos.specificInfos.posterParamName], 'urlPosters') + `');`"
-                     @mouseover="hovered[index] = true" @mouseout="hovered[index] = false">
+            <div v-else
+                 @click="showModal(item)"
+                 class="tw-col-span-1 tw-w-[6rem] tw-h-[9rem] tw-rounded-xl !tw-bg-cover !tw-bg-center tw-relative tw-cursor-pointer"
+                 :style="`background:url('` + getUrl(item[apiInfos.specificInfos.posterParamName], 'urlPosters') + `');`"
+                 @mouseover="hovered[index] = true" @mouseout="hovered[index] = false">
 
-                    <div class="tw-flex tw-flex-col tw-justify-between tw-items-center tw-gap-2 tw-p-5 text-center tw-text-white hover:tw-bg-black hover:tw-bg-opacity-50 tw-h-full tw-w-full tw-rounded-xl">
-                        <div></div>
-
-                        <div v-show="hovered[index]">
-                            <div class="tw-font-black">{{ item[apiInfos.specificInfos.titleParamName] }}</div>
-                            <div>{{ frenchizeDate(item[apiInfos.specificInfos.dateParamName]) }}</div>
-                        </div>
-
-                        <v-btn @click.stop="addOrRemoveFromMyList(item)"
-                               v-show="hovered[index] || myList.includes(item)"
-                               :color="myList.includes(item) === true ? '#0f2027' : ''"
-                               icon flat>
-                            <v-icon color="white">
-                                {{ myList.includes(item) === false ? 'mdi-plus' : 'mdi-heart' }}
-                            </v-icon>
-                        </v-btn>
-                    </div>
+                <div class="tw-flex tw-flex-col tw-justify-between tw-items-center tw-gap-2 tw-p-5 text-center tw-text-white hover:tw-bg-black hover:tw-bg-opacity-50 tw-h-full tw-w-full tw-rounded-xl">
+                    <v-btn @click.stop="addOrRemoveFromMyList(item)"
+                           v-show="hovered[index] || myList.includes(item)"
+                           :color="myList.includes(item) === true ? '#0f2027' : ''"
+                           icon flat>
+                        <v-icon color="white">
+                            {{ myList.includes(item) === false ? 'mdi-plus' : 'mdi-heart' }}
+                        </v-icon>
+                    </v-btn>
                 </div>
+            </div>
+
+            <div class="tw-text-white">
+                <div class="tw-font-black">{{ item[apiInfos.specificInfos.titleParamName] }}</div>
+                <div>{{ frenchizeDate(item[apiInfos.specificInfos.dateParamName]) }}</div>
             </div>
         </div>
     </div>
@@ -68,10 +63,11 @@
                         </h4>
 
                         <div class="tw-flex tw-overflow-x-scroll">
-                            <div v-for="castMember in activeItemDetails.credits.cast" class="tw-text-white tw-w-24 tw-flex tw-flex-col tw-items-center">
+                            <div v-for="castMember in activeItemDetails.credits.cast"
+                                 class="tw-text-white tw-w-24 tw-flex tw-flex-col tw-items-center">
                                 <div :style="getProfilePicture(castMember.profile_path)"
                                      class="tw-w-14 tw-h-14 tw-rounded-full tw-shadow-2xl !tw-bg-cover !tw-bg-center tw-mr-2"></div>
-                                <div class="tw-text-xs tw-text-center">{{castMember.name}}</div>
+                                <div class="tw-text-xs tw-text-center">{{ castMember.name }}</div>
                             </div>
                         </div>
                     </div>
@@ -83,7 +79,7 @@
 
                         <div class="flex">
                             <div v-for="crewMember in crew" class="tw-text-white">
-                                {{crewMember.name}} - {{crewMember.job}}
+                                {{ crewMember.name }} - {{ crewMember.job }}
                             </div>
                         </div>
                     </div>
@@ -92,12 +88,12 @@
 
             <v-card-text v-else class="!tw-p-0 tw-aspect-w-16 tw-aspect-h-9">
                 <iframe
-                    width="100%"
-                    height="100%"
-                    :src="'https://www.youtube.com/embed/' + activeItemDetails.videos.results[0].key + '?autoplay=1'"
-                    title="YouTube video player"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowfullscreen>
+                        width="100%"
+                        height="100%"
+                        :src="'https://www.youtube.com/embed/' + activeItemDetails.videos.results[0].key + '?autoplay=1'"
+                        title="YouTube video player"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen>
                 </iframe>
             </v-card-text>
         </v-card>
@@ -249,6 +245,11 @@ export default defineComponent({
             if (val === false) {
                 this.clickedLink = false;
             }
+        },
+        myList: {
+            handler() {
+                this.$emit('update-items', this.myList);
+            }, deep: true
         }
     }
 })

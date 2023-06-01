@@ -2,10 +2,9 @@
 
 namespace App\Controller;
 
-use App\Entity\Upcoming;
 use App\Entity\User;
 use App\Exception\AppException;
-use App\Repository\UpcomingRepository;
+use App\Manager\UpcomingManager;
 use App\Repository\UserRepository;
 use App\Service\Api\Connector\TmdbApiConnector;
 use App\Service\ApiService;
@@ -20,61 +19,33 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 #[Route('/api')]
 class ApiController extends AbstractController
 {
-    #[Route('/save-upcoming-{type}', name: 'create_upcoming')]
-    public function saveUpcoming(string $type, array $data, UpcomingRepository $upcomingRepository): JsonResponse
-    {
-        $upcoming = new Upcoming();
-        $upcoming
-            ->setType($type)
-            ->setCreatedAt(new \DateTimeImmutable())
-            ->setContent($data);
-
-        $upcomingRepository->save($upcoming, true);
-
-        return new JsonResponse();
-    }
-
     #[Route('/get-upcoming-{type}-{period}-months', name: 'get_upcoming')]
     public function getUpcoming(
         string $type,
         int $period,
-        UpcomingRepository $upcomingRepository,
+        UpcomingManager $upcomingManager,
         ApiService $apiService,
         TmdbApiConnector $tmdbApiConnector,
         Request $request
     ): JsonResponse
     {
         $params = $request->toArray();
-        $dbDataDirty = $apiService->isDbDataDirtyOrMissing($upcomingRepository, $type, $period);
+        $dbDataDirty = $apiService->isDbDataDirtyOrMissing($type, $period);
 
         if ($dbDataDirty === true) {
-            switch ($type) {
-                case 'movies':
-                    $upcoming = $tmdbApiConnector->fetchUpcoming($params, '/3/discover/movie');
+            $data = match ($type) {
+                'movies' => $tmdbApiConnector->fetchUpcoming($params, '/3/discover/movie'),
+                'tv' => $tmdbApiConnector->fetchUpcoming($params, '/3/discover/tv'),
+                default => throw new AppException('Invalid type'),
+            };
 
-                    break;
-                case 'tv':
-                    $upcoming = $tmdbApiConnector->fetchUpcoming($params, '/3/discover/tv');
-
-                    break;
-                case 'games':
-                    // do something
-                default:
-                    throw new AppException('Invalid type');
-            }
-
-            $this->saveUpcoming($type, $upcoming, $upcomingRepository);
-        } else {
-            $upcoming = $upcomingRepository->findBy(
-                ['type' => $type, 'period' => $period],
-                ['createdAt' => 'DESC'],
-                1
-            )[0];
+            $upcomingManager->saveUpcoming($type, $period, $data);
         }
 
-        // ICI sauvegarder les données + savoir si je les choppe depuis la bdd après ou j'envoie direct ?
+        $upcoming = $upcomingManager->getLastEntry($type, $period);
 
-        if (empty($upcoming)) {
+        //TODO: c pa ouf
+        if ($upcoming === null) {
             return new JsonResponse();
         }
 

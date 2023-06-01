@@ -10,6 +10,7 @@ class EntryController extends AbstractController
 {
     #[Route('/', name: 'homepage')]
     #[Route('/{route}', name: 'vue_pages')]
+    #[Route('/t/{route}', name: 'vue_pages')]
     public function index(): Response
     {
         return $this->render('index.html.twig');

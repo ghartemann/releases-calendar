@@ -1,16 +1,16 @@
 <template>
     <div id="gradient">
-<!--        <v-app>-->
         <app-bar></app-bar>
 
-        <router-view></router-view>
-<!--        </v-app>-->
+        <div class="tw-container tw-mx-auto tw-py-20">
+            <router-view></router-view>
+        </div>
     </div>
 </template>
 
 <script>
 import {defineComponent} from 'vue';
-import AppBar from "@pages/components/app-bar.vue";
+import AppBar from "@pages/components/app-bar";
 
 export default defineComponent({
     name: "App",

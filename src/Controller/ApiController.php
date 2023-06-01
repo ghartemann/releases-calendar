@@ -2,10 +2,12 @@
 
 namespace App\Controller;
 
-use App\Entity\Upcoming;
 use App\Entity\User;
-use App\Repository\UpcomingRepository;
+use App\Exception\AppException;
+use App\Manager\UpcomingManager;
 use App\Repository\UserRepository;
+use App\Service\Api\Connector\TmdbApiConnector;
+use App\Service\ApiService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,32 +19,37 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 #[Route('/api')]
 class ApiController extends AbstractController
 {
-    #[Route('/save-upcoming-{type}', name: 'create_upcoming')]
-    public function saveUpcoming(string $type, Request $request, UpcomingRepository $upcomingRepository): JsonResponse
+    #[Route('/get-upcoming-{type}-{period}-months', name: 'get_upcoming')]
+    public function getUpcoming(
+        string $type,
+        int $period,
+        UpcomingManager $upcomingManager,
+        ApiService $apiService,
+        TmdbApiConnector $tmdbApiConnector,
+        Request $request
+    ): JsonResponse
     {
-        $infos = $request->toArray();
+        $params = $request->toArray();
+        $dbDataDirty = $apiService->isDbDataDirtyOrMissing($type, $period);
 
-        $upcoming = new Upcoming();
-        $upcoming
-            ->setType($type)
-            ->setCreatedAt(new \DateTimeImmutable())
-            ->setContent($infos['items']);
+        if ($dbDataDirty === true) {
+            $data = match ($type) {
+                'movies' => $tmdbApiConnector->fetchUpcoming($params, '/3/discover/movie'),
+                'tv' => $tmdbApiConnector->fetchUpcoming($params, '/3/discover/tv'),
+                default => throw new AppException('Invalid type'),
+            };
 
-        $upcomingRepository->save($upcoming, true);
+            $upcomingManager->saveUpcoming($type, $period, $data);
+        }
 
-        return new JsonResponse();
-    }
+        $upcoming = $upcomingManager->getLastEntry($type, $period);
 
-    #[Route('/get-upcoming-{type}', name: 'get_upcoming')]
-    public function getUpcoming(string $type, UpcomingRepository $upcomingRepository): JsonResponse
-    {
-        $upcoming = $upcomingRepository->findBy(['type' => $type], ['createdAt' => 'DESC'], 1);
-
-        if (empty($upcoming)) {
+        //TODO: c pa ouf
+        if ($upcoming === null) {
             return new JsonResponse();
         }
 
-        return $this->json($upcoming[0], 200, [], ['groups' => ['movies']]);
+        return $this->json($upcoming);
     }
 
     #[Route('/register', name: 'register')]
@@ -81,5 +88,13 @@ class ApiController extends AbstractController
             'last_username' => $lastUsername,
             'error' => $error,
         ]);
+    }
+
+    #[Route('/test', name: 'test')]
+    public function test(TmdbApiConnector $tmdbApiConnector, Request $request): JsonResponse
+    {
+        $params = $request->toArray();
+
+        return new JsonResponse($tmdbApiConnector->fetchUpcoming($params, 'https://api.themoviedb.org/3/discover/movie'));
     }
 }

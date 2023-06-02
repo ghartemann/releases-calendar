@@ -68,10 +68,11 @@
                         </h4>
 
                         <div class="tw-flex tw-overflow-x-scroll">
-                            <div v-for="castMember in activeItemDetails.credits.cast" class="tw-text-white tw-w-24 tw-flex tw-flex-col tw-items-center">
+                            <div v-for="castMember in activeItemDetails.credits.cast"
+                                 class="tw-text-white tw-w-24 tw-flex tw-flex-col tw-items-center">
                                 <div :style="getProfilePicture(castMember.profile_path)"
                                      class="tw-w-14 tw-h-14 tw-rounded-full tw-shadow-2xl !tw-bg-cover !tw-bg-center tw-mr-2"></div>
-                                <div class="tw-text-xs tw-text-center">{{castMember.name}}</div>
+                                <div class="tw-text-xs tw-text-center">{{ castMember.name }}</div>
                             </div>
                         </div>
                     </div>
@@ -83,7 +84,7 @@
 
                         <div class="flex">
                             <div v-for="crewMember in crew" class="tw-text-white">
-                                {{crewMember.name}} - {{crewMember.job}}
+                                {{ crewMember.name }} - {{ crewMember.job }}
                             </div>
                         </div>
                     </div>
@@ -92,12 +93,12 @@
 
             <v-card-text v-else class="!tw-p-0 tw-aspect-w-16 tw-aspect-h-9">
                 <iframe
-                    width="100%"
-                    height="100%"
-                    :src="'https://www.youtube.com/embed/' + activeItemDetails.videos.results[0].key + '?autoplay=1'"
-                    title="YouTube video player"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowfullscreen>
+                        width="100%"
+                        height="100%"
+                        :src="'https://www.youtube.com/embed/' + activeItemDetails.videos.results[0].key + '?autoplay=1'"
+                        title="YouTube video player"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen>
                 </iframe>
             </v-card-text>
         </v-card>
@@ -179,7 +180,14 @@ export default defineComponent({
         getItems() {
             this.loading = true;
 
-            axios.post('/api/get-upcoming-' + this.type + '-' + this.period + '-months', {data: this.apiInfos.params}).then((r) => {
+            axios.post(
+                '/api/get-upcoming-' + this.type,
+                {
+                    params: this.apiInfos.params,
+                    period: this.period,
+                    nbItems: 60
+                }
+            ).then((r) => {
                 this.items = r.data.content;
 
                 this.items.sort((a, b) => {

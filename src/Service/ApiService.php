@@ -15,12 +15,20 @@ class ApiService
     }
 
 
-    public function isDbDataDirtyOrMissing(string $type, int $period): bool
+    public function isDbDataDirtyOrMissing(string $type, int $period, int $nbItems): bool
     {
         /** @var UpcomingRepository $upcomingRepository */
         $upcomingRepository = $this->upcomingManager->getClassRepository();
 
-        $upcoming = $upcomingRepository->findBy(['type' => $type, 'period' => $period], ['createdAt' => 'DESC'], 1);
+        $upcoming = $upcomingRepository->findBy(
+            [
+                'type' => $type,
+                'period' => $period,
+                'nbItems' => $nbItems
+            ],
+            ['createdAt' => 'DESC'],
+            1
+        );
 
         return empty($upcoming) || $upcoming[0]->getCreatedAt()->diff(new \DateTimeImmutable())->days > 1;
     }

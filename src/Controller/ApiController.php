@@ -19,18 +19,21 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 #[Route('/api')]
 class ApiController extends AbstractController
 {
-    #[Route('/get-upcoming-{type}-{period}-months', name: 'get_upcoming')]
+    #[Route('/get-upcoming-{type}', name: 'get_upcoming')]
     public function getUpcoming(
         string $type,
-        int $period,
         UpcomingManager $upcomingManager,
         ApiService $apiService,
         TmdbApiConnector $tmdbApiConnector,
         Request $request
     ): JsonResponse
     {
-        $params = $request->toArray();
-        $dbDataDirty = $apiService->isDbDataDirtyOrMissing($type, $period);
+        dump($request->toArray());
+        $params = $request->toArray()['params'];
+        $period = $request->toArray()['period'];
+        $nbItems = $request->toArray()['nbItems'];
+
+        $dbDataDirty = $apiService->isDbDataDirtyOrMissing($type, $period, $nbItems);
 
         if ($dbDataDirty === true) {
             $data = match ($type) {
@@ -39,7 +42,7 @@ class ApiController extends AbstractController
                 default => throw new AppException('Invalid type'),
             };
 
-            $upcomingManager->saveUpcoming($type, $period, $data);
+            $upcomingManager->saveUpcoming($type, $period, $data, $nbItems);
         }
 
         $upcoming = $upcomingManager->getLastEntry($type, $period);

@@ -1,6 +1,6 @@
 <template>
-    <div class="tw-bg-white tw-rounded-2xl tw-shadow-2xl tw-w-full tw-h-72">
-        <h2>My list</h2>
+    <div class="tw-bg-white tw-rounded-2xl tw-shadow-2xl tw-w-full tw-min-h-full tw-p-10">
+        <h2 class="tw-text-5xl tw-text-black">My list</h2>
 
         <div v-for="(item, index) in items" :key="index">
             <list-item :item="item"></list-item>

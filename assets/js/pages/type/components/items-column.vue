@@ -107,6 +107,7 @@ import moment from "moment/moment";
 
 export default defineComponent({
     name: "items-mosaic",
+    emits: ['update-items'],
     props: {
         type: {
             type: String,
@@ -132,6 +133,7 @@ export default defineComponent({
         hovered: [],
         myList: [],
         test: [],
+        period: 12,
         loading: false,
         contentModal: false
     }),
@@ -175,7 +177,14 @@ export default defineComponent({
         getItems() {
             this.loading = true;
 
-            axios.post('/api/get-upcoming-' + this.type + '-' + this.period + '-months', {data: this.apiInfos.params}).then((r) => {
+            axios.post(
+                '/api/get-upcoming-' + this.type,
+                {
+                    params: this.apiInfos.params,
+                    period: this.period,
+                    nbItems: 60
+                }
+            ).then((r) => {
                 this.items = r.data.content;
 
                 this.items.sort((a, b) => {
@@ -248,6 +257,10 @@ export default defineComponent({
         },
         myList: {
             handler() {
+                this.myList.sort((a, b) => {
+                    return new Date(a[this.apiInfos.specificInfos.dateParamName]) - new Date(b[this.apiInfos.specificInfos.dateParamName]);
+                });
+
                 this.$emit('update-items', this.myList);
             }, deep: true
         }

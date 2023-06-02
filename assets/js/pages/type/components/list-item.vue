@@ -1,5 +1,8 @@
 <template>
-    <h3>{{ item.title }}</h3>
+    <div class="tw-flex tw-justify-between">
+        <h3 class="tw-text-black">{{ item.title }}</h3>
+        <div class="tw-text-black">{{ item.release_date }}</div>
+    </div>
 </template>
 
 <script>

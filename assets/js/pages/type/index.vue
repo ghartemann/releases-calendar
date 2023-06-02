@@ -1,6 +1,6 @@
 <template>
-    <div class="tw-flex tw-flex-col tw-items-center">
-        <div class="tw-flex tw-justify-between tw-w-full tw-items-baseline">
+    <div class="tw-flex tw-flex-col tw-gap-24 tw-items-center">
+        <div class="tw-flex tw-justify-between tw-container tw-items-baseline">
             <router-link :to="{ name: 'homepage' }">
                 <h2 class="tw-text-2xl">
                     <v-icon>mdi-chevron-left</v-icon>
@@ -15,8 +15,8 @@
             <div></div>
         </div>
 
-        <div class="tw-grid tw-grid-cols-3">
-            <div class="tw-col-span-1">
+        <div class="tw-grid tw-grid-cols-4 tw-gap-5 tw-container">
+            <div class="tw-col-span-2">
                 <items-column
                     :api-infos="apiInfos[type]"
                     :period="6"
@@ -25,7 +25,7 @@
                 </items-column>
             </div>
 
-            <div class="tw-col-span-3">
+            <div class="tw-col-span-2">
                 <my-list :items="items"></my-list>
             </div>
         </div>
@@ -66,7 +66,7 @@ export default defineComponent({
                         include_adult: false,
                         include_video: true,
                         language: 'fr_FR',
-                        page: 1,
+                        page: 3,
                         sort_by: 'popularity.desc',
                         with_release_type: '2|3',
                         'primary_release_date.gte': new moment().format('YYYY-MM-DD'),

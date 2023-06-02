@@ -29,6 +29,9 @@ class Upcoming
     #[ORM\Column]
     private ?int $period = null;
 
+    #[ORM\Column]
+    private ?int $nbItems = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -78,6 +81,18 @@ class Upcoming
     public function setPeriod(int $period): self
     {
         $this->period = $period;
+
+        return $this;
+    }
+
+    public function getNbItems(): ?int
+    {
+        return $this->nbItems;
+    }
+
+    public function setNbItems(int $nbItems): self
+    {
+        $this->nbItems = $nbItems;
 
         return $this;
     }

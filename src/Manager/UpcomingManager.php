@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class UpcomingManager extends AbstractManager
 {
-    public function saveUpcoming(string $type, int $period, array $data): JsonResponse
+    public function saveUpcoming(string $type, int $period, array $data, int $nbItems): JsonResponse
     {
         /** @var UpcomingRepository $upcomingRepository */
         $upcomingRepository = $this->getClassRepository();
@@ -18,7 +18,8 @@ class UpcomingManager extends AbstractManager
             ->setType($type)
             ->setCreatedAt(new \DateTimeImmutable())
             ->setContent($data)
-            ->setPeriod($period);
+            ->setPeriod($period)
+            ->setNbItems($nbItems);
 
         $upcomingRepository->save($upcoming, true);
 

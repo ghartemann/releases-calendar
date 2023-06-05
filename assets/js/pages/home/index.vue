@@ -79,11 +79,9 @@ export default defineComponent({
                         with_release_type: '2|3',
                         'primary_release_date.gte': new moment().format('YYYY-MM-DD'),
                         'primary_release_date.lte': new moment().add(this.displayTime, 'months').format('YYYY-MM-DD'),
-                        api_key: process.env.TMDB_API_KEY
                     },
                     detailsParams: {
                         append_to_response: 'credits,videos',
-                        api_key: process.env.TMDB_API_KEY
                     }
                 },
                 tv: {
@@ -104,11 +102,9 @@ export default defineComponent({
                         sort_by: 'popularity.desc',
                         'first_air_date.gte': new moment().format('YYYY-MM-DD'),
                         'first_air_date.lte': new moment().add(this.displayTime, 'months').format('YYYY-MM-DD'),
-                        api_key: process.env.TMDB_API_KEY
                     },
                     detailsParams: {
                         append_to_response: 'credits,videos',
-                        api_key: process.env.TMDB_API_KEY
                     }
                 },
                 games: {
@@ -122,7 +118,6 @@ export default defineComponent({
                     },
                     params: {
                         dates: new moment().format('YYYY-MM-DD') + ',' + new moment().add(this.displayTime, 'months').format('YYYY-MM-DD'),
-                        key: process.env.RAWG_API_KEY
                     }
                 },
                 loading: false

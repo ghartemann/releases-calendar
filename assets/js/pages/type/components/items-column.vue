@@ -65,8 +65,11 @@
                         <div class="tw-flex tw-overflow-x-scroll">
                             <div v-for="castMember in activeItemDetails.credits.cast"
                                  class="tw-text-white tw-w-24 tw-flex tw-flex-col tw-items-center">
-                                <div :style="getProfilePicture(castMember.profile_path)"
+                                <div v-if="castMember.profile_path" :style="getProfilePicture(castMember.profile_path)"
                                      class="tw-w-14 tw-h-14 tw-rounded-full tw-shadow-2xl !tw-bg-cover !tw-bg-center tw-mr-2"></div>
+
+                                <div v-else class="tw-w-14 tw-h-14 tw-rounded-full tw-shadow-2xl !tw-bg-cover !tw-bg-center tw-mr-2"
+                                     style="background:url('https://www.blexar.com/avatar.png');"></div>
                                 <div class="tw-text-xs tw-text-center">{{ castMember.name }}</div>
                             </div>
                         </div>
@@ -137,39 +140,6 @@ export default defineComponent({
         loading: false,
         contentModal: false
     }),
-    computed: {
-        crew() {
-            if (this.activeItemDetails.credits) {
-                const crew = [];
-
-                this.activeItemDetails.credits.crew.forEach((crewMember) => {
-                    if (crewMember.job === 'Director') {
-                        crew.push(crewMember);
-                    }
-                });
-
-                this.activeItemDetails.credits.crew.forEach((crewMember) => {
-                    if (crewMember.job === 'Executive producer') {
-                        crew.push(crewMember);
-                    }
-                });
-
-                this.activeItemDetails.credits.crew.forEach((crewMember) => {
-                    if (crewMember.job === 'Producer') {
-                        crew.push(crewMember);
-                    }
-                });
-
-                this.activeItemDetails.credits.crew.forEach((crewMember) => {
-                    if (crewMember.job === 'Writer') {
-                        crew.push(crewMember);
-                    }
-                });
-
-                return crew;
-            }
-        }
-    },
     created() {
         this.getItems();
     },
@@ -198,22 +168,19 @@ export default defineComponent({
                 this.loading = false;
             });
         },
-        //TODO: passer ça en back aussi
         getActiveItemDetails() {
-            if (this.apiInfos.specificInfos.urlDetails) {
-                this.loadingActiveItemDetails = true;
+            this.loadingActiveItemDetails = true;
 
-                axios.get(
-                    this.apiInfos.specificInfos.urlDetails + this.activeItem.id,
-                    {params: this.apiInfos.detailsParams}
-                ).then((r) => {
-                    this.activeItemDetails = r.data;
-                }).catch((error) => {
-                    console.error(error);
-                }).finally(() => {
-                    this.loadingActiveItemDetails = false;
-                });
-            }
+            axios.post(
+                '/api/get-details/' + this.type + '/' + this.activeItem.id,
+                {params: this.apiInfos.detailsParams}
+            ).then((r) => {
+                this.activeItemDetails = r.data;
+            }).catch((error) => {
+                console.error(error);
+            }).finally(() => {
+                this.loadingActiveItemDetails = false;
+            });
         },
         getUrl(path, type) {
             if (path === null) {

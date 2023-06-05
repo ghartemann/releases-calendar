@@ -82,7 +82,7 @@ export default defineComponent({
         accountCreate() {
             this.loading = true;
 
-            axios.post('/api/register', {
+            axios.post('/user/register', {
                 email: this.loginForm.email,
                 password: this.loginForm.password
             }).then(() => {

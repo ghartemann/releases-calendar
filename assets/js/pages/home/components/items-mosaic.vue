@@ -83,7 +83,7 @@
                         </h4>
 
                         <div class="flex">
-                            <div v-for="crewMember in crew" class="tw-text-white">
+                            <div v-for="crewMember in activeItemDetails.credits.crew" class="tw-text-white">
                                 {{ crewMember.name }} - {{ crewMember.job }}
                             </div>
                         </div>
@@ -140,39 +140,6 @@ export default defineComponent({
         loading: false,
         contentModal: false
     }),
-    computed: {
-        crew() {
-            if (this.activeItemDetails.credits) {
-                const crew = [];
-
-                this.activeItemDetails.credits.crew.forEach((crewMember) => {
-                    if (crewMember.job === 'Director') {
-                        crew.push(crewMember);
-                    }
-                });
-
-                this.activeItemDetails.credits.crew.forEach((crewMember) => {
-                    if (crewMember.job === 'Executive producer') {
-                        crew.push(crewMember);
-                    }
-                });
-
-                this.activeItemDetails.credits.crew.forEach((crewMember) => {
-                    if (crewMember.job === 'Producer') {
-                        crew.push(crewMember);
-                    }
-                });
-
-                this.activeItemDetails.credits.crew.forEach((crewMember) => {
-                    if (crewMember.job === 'Writer') {
-                        crew.push(crewMember);
-                    }
-                });
-
-                return crew;
-            }
-        }
-    },
     created() {
         this.getItems();
     },
@@ -201,22 +168,19 @@ export default defineComponent({
                 this.loading = false;
             });
         },
-        //TODO: passer ça en back aussi
         getActiveItemDetails() {
-            if (this.apiInfos.specificInfos.urlDetails) {
-                this.loadingActiveItemDetails = true;
+            this.loadingActiveItemDetails = true;
 
-                axios.get(
-                    this.apiInfos.specificInfos.urlDetails + this.activeItem.id,
-                    {params: this.apiInfos.detailsParams}
-                ).then((r) => {
-                    this.activeItemDetails = r.data;
-                }).catch((error) => {
-                    console.error(error);
-                }).finally(() => {
-                    this.loadingActiveItemDetails = false;
-                });
-            }
+            axios.post(
+                '/api/get-details/' + this.type + '/' + this.activeItem.id,
+                {params: this.apiInfos.detailsParams}
+            ).then((r) => {
+                this.activeItemDetails = r.data;
+            }).catch((error) => {
+                console.error(error);
+            }).finally(() => {
+                this.loadingActiveItemDetails = false;
+            });
         },
         getUrl(path, type) {
             if (path === null) {
